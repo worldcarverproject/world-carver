@@ -1,0 +1,79 @@
+services:
+  carver-db:
+    image: postgres:17-alpine
+    command: postgres -c 'max_connections=1000'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    env_file:
+      - ./.envs/local/db/.env
+    environment:
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  api:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+      args:
+        DOCKER_BUILDKIT: 1
+    volumes:
+      - ./apps/api:/app
+    command: /start
+    env_file:
+      - ./.envs/local/api/.env
+    depends_on:
+      - carver-db
+      - redis
+    ports:
+      - "8000:8000"
+
+  redis:
+    image: redis:7-alpine
+
+  carver-worker:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: carver_celery_worker
+    command: /start-worker
+    volumes:
+      - ./apps/api:/app
+    env_file:
+      - ./.envs/local/api/.env
+    depends_on:
+      - redis
+      - carver-db
+
+  carver-beat:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: carver_celery_beat
+    command: /start-beat
+    volumes:
+      - ./apps/api:/app
+    env_file:
+      - ./.envs/local/api/.env
+    depends_on:
+      - redis
+      - carver-db
+
+  carver-flower:
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: carver_celery_flower
+    command: /start-flower
+    volumes:
+      - ./apps/api:/app
+    env_file:
+      - ./.envs/local/api/.env
+    ports:
+      - 5557:5555
+    depends_on:
+      - redis
+      - carver-db
+
+volumes:
+  pgdata:
