@@ -75,5 +75,17 @@ services:
       - redis
       - carver-db
 
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file:
+      - ./.envs/local/pgadmin/.env
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - carver-db
+
 volumes:
   pgdata:
+  pgadmin_data:
