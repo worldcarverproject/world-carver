@@ -1,12 +1,17 @@
-FROM python:3.13-slim-bookworm
+FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1
+    UV_PYTHON_DOWNLOADS=0 \
+    UV_LINK_MODE=copy \
+    UV_PROJECT_ENVIRONMENT=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
 
-COPY ./apps/api/requirements.txt /requirements.txt
+COPY ./apps/api/pyproject.toml ./apps/api/uv.lock ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev --no-install-project
 
-RUN pip install -r /requirements.txt
+COPY ./apps/api/ ${APP_HOME}/
 
 COPY ./compose/local/django/entrypoint.sh /entrypoint.sh
 COPY ./compose/local/django/start /start
