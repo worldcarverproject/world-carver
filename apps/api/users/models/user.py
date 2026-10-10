@@ -32,16 +32,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     # status fields
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    is_verified = models.BooleanField(default=False)
+    is_email_verified = models.BooleanField(default=False)
 
     # tracking fields
+    email_verified_at = models.DateTimeField(null=True, blank=True, verbose_name="Email Verified At")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Last Modified At")
 
     objects = UserManager()
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["username"]
 
     def __str__(self):
         return self.email

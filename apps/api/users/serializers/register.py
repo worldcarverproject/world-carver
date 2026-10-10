@@ -18,3 +18,12 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data["password"],
         )
         return user
+    
+    
+class EmailVerificationSerializer(serializers.Serializer):
+    uuid = serializers.UUIDField()
+    token = serializers.CharField(max_length=555)
+    
+    
+class ResendVerificationSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)

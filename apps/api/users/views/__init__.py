@@ -1,1 +1,1 @@
-from .register import RegisterView
+from .register import RegisterView, ResendVerificationView, VerifyEmailView

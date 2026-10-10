@@ -1,1 +1,1 @@
-from .register import RegisterSerializer
+from .register import RegisterSerializer, EmailVerificationSerializer, ResendVerificationSerializer
